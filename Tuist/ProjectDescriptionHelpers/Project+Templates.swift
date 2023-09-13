@@ -21,18 +21,36 @@ extension Project {
 
     /// Helper function to create a framework target and an associated unit test target
     private static func makeFrameworkTargets(name: String, platform: Platform) -> [Target] {
-        let sources = Target(name: name,
-                platform: platform,
-                product: .framework,
-                bundleId: "io.tuist.\(name)",
-                infoPlist: .default,
-                sources: ["Targets/\(name)/Sources/**"],
-                resources: [],
-                dependencies: [
-                    .external(name: "Amplify"),
-                    .external(name: "AWSCognitoAuthPlugin"),
-                    .external(name: "AWSAPIPlugin"),
+        let sources = Target(
+            name: name,
+            platform: platform,
+            product: .framework,
+            bundleId: "io.tuist.\(name)",
+            infoPlist: .default,
+            sources: ["Targets/\(name)/Sources/**"],
+            resources: [],
+            dependencies: [
+                .external(name: "Amplify"),
+                .external(name: "AWSCognitoAuthPlugin"),
+                .external(name: "AWSAPIPlugin"),
+            ],
+            settings: .settings(base: [
+                "OTHER_SWIFT_FLAGS": "-Xcc -Wno-error=non-modular-include-in-framework-module",
+                "HEADER_SEARCH_PATHS": .array([
+                    "$(inherited)",
+                    "$(SRCROOT)/Tuist/Dependencies/SwiftPackageManager/.build/checkouts/aws-crt-swift/aws-common-runtime/aws-c-auth/include",
+                    "$(SRCROOT)/Tuist/Dependencies/SwiftPackageManager/.build/checkouts/aws-crt-swift/aws-common-runtime/aws-c-cal/include",
+                    "$(SRCROOT)/Tuist/Dependencies/SwiftPackageManager/.build/checkouts/aws-crt-swift/aws-common-runtime/aws-c-io/include",
+                    "$(SRCROOT)/Tuist/Dependencies/SwiftPackageManager/.build/checkouts/aws-crt-swift/aws-common-runtime/aws-c-common/include",
+                    "$(SRCROOT)/Tuist/Dependencies/SwiftPackageManager/.build/checkouts/aws-crt-swift/aws-common-runtime/aws-c-sdkutils/include",
+                    "$(SRCROOT)/Tuist/Dependencies/SwiftPackageManager/.build/checkouts/aws-crt-swift/aws-common-runtime/aws-c-http/include",
+                    "$(SRCROOT)/Tuist/Dependencies/SwiftPackageManager/.build/checkouts/aws-crt-swift/aws-common-runtime/aws-c-compression/include",
+                    "$(SRCROOT)/Tuist/Dependencies/SwiftPackageManager/.build/checkouts/aws-crt-swift/aws-common-runtime/config",
+                    "$(SRCROOT)/Tuist/Dependencies/SwiftPackageManager/.build/checkouts/aws-crt-swift/aws-common-runtime/aws-c-event-stream/include",
+                    "$(SRCROOT)/Tuist/Dependencies/SwiftPackageManager/.build/checkouts/amplify-swift/AmplifyPlugins/Auth/Sources/libtommath/include"
                 ])
+            ])
+        )
         let tests = Target(name: "\(name)Tests",
                 platform: platform,
                 product: .unitTests,
